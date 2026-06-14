@@ -15,6 +15,10 @@ const envSchema = Joi.object({
 
     JWT_SECRET: Joi.string().required(),
     JWT_EXPIRES_IN: Joi.string().default("7d"),
+
+    OPENAI_API_KEY: Joi.string().required(),
+    OPENAI_EMBEDDING_MODEL: Joi.string().default("text-embedding-3-small"),
+    OPENAI_CHAT_MODEL: Joi.string().default("gpt-4o"),
 }).unknown(); // allow extra env vars
 
 const { value: envVars, error } = envSchema.validate(process.env, {
@@ -37,6 +41,10 @@ const env = {
     cloudinaryCloudName: envVars.CLOUDINARY_CLOUD_NAME,
     cloudinaryAPIKey: envVars.CLOUDINARY_API_KEY,
     cloudinaryAPISecret: envVars.CLOUDINARY_API_SECRET,
+
+    openaiApiKey: envVars.OPENAI_API_KEY,
+    openaiEmbeddingModel: envVars.OPENAI_EMBEDDING_MODEL,
+    openaiChatModel: envVars.OPENAI_CHAT_MODEL,
 };
 
 export default env;
