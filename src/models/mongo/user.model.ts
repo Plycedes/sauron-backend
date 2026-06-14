@@ -7,6 +7,7 @@ export interface IUserDocument extends Document {
     email: string;
     passwordHash: string;
     role: UserRole;
+    companyId?: mongoose.Types.ObjectId;
     avatar?: string;
     status: UserStatus;
     refreshTokens: string[];
@@ -23,9 +24,10 @@ const UserSchema = new Schema<IUserDocument>(
         passwordHash: { type: String, required: true },
         role: {
             type: String,
-            enum: ["user", "admin"],
-            default: "user",
+            enum: ["super_admin", "company_admin", "pm", "member"],
+            default: "member",
         },
+        companyId: { type: Schema.Types.ObjectId, ref: "Company" },
         avatar: { type: String },
         status: {
             type: String,
