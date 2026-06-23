@@ -42,10 +42,10 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response): 
     sendResponse(res, 200, profile, "User retrieved successfully");
 });
 
-export const refreshToken = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-    const userId = req.userId!;
+export const refreshToken = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { refreshToken } = req.body;
 
-    const result = await authService.refreshToken(userId);
+    const result = await authService.refreshToken(refreshToken);
 
     sendResponse(res, 200, result, "Token refreshed successfully");
 });

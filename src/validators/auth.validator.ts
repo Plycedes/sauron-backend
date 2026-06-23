@@ -32,10 +32,8 @@ export const AuthSchema = {
     },
 
     refresh: {
-        body: z
-            .object({
-                refreshToken: z.string().optional(),
-            })
-            .optional(),
+        body: z.object({
+            refreshToken: z.string().min(1, "Refresh token is required"),
+        }),
     },
 };

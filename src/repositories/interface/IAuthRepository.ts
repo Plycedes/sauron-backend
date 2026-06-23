@@ -20,4 +20,5 @@ export interface IAuthRepository {
     storeRefreshToken(id: string, refreshToken: string): Promise<void>;
     revokeRefreshToken(id: string, refreshToken: string): Promise<void>;
     revokeAllRefreshTokens(id: string): Promise<number>;
+    hasRefreshToken(id: string, refreshToken: string): Promise<boolean>;
 }

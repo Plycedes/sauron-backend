@@ -26,7 +26,7 @@ export interface LoginUserInput {
 }
 
 export interface RefreshTokenInput {
-    refreshToken?: string;
+    refreshToken: string;
 }
 
 export interface LogoutInput {
@@ -40,13 +40,17 @@ export interface UpdateUserInput {
 
 export interface AuthResponse {
     user: UserProfile;
-    token: string;
-    expiresAt: string;
+    accessToken: string;
+    refreshToken: string;
+    accessTokenExpiresAt: string;
+    refreshTokenExpiresAt: string;
 }
 
 export interface RefreshResponse {
-    token: string;
-    expiresAt: string;
+    accessToken: string;
+    refreshToken: string;
+    accessTokenExpiresAt: string;
+    refreshTokenExpiresAt: string;
 }
 
 export interface LogoutResponse {

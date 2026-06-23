@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import env from "../config/env";
 import { authRepository, userRepository } from "../repositories";
 import {
     CreateUserInput,
@@ -11,7 +12,6 @@ import {
 import { ApiError, jwt } from "../utils";
 
 const BCRYPT_ROUNDS = 12;
-const ACCESS_TOKEN_EXPIRY = "1d";
 
 export async function register(input: CreateUserInput): Promise<AuthResponse> {
     const existingEmail = await authRepository.findByEmail(input.email);
@@ -36,14 +36,7 @@ export async function register(input: CreateUserInput): Promise<AuthResponse> {
         throw new ApiError(500, "Failed to load newly created user");
     }
 
-    const token = generateAccessToken(profile);
-    const expiresAt = getTokenExpiry(ACCESS_TOKEN_EXPIRY);
-
-    return {
-        user: profile,
-        token,
-        expiresAt,
-    };
+    return issueAndStoreTokens(profile);
 }
 
 export async function login(input: LoginUserInput): Promise<AuthResponse> {
@@ -70,21 +63,16 @@ export async function login(input: LoginUserInput): Promise<AuthResponse> {
         throw new ApiError(401, "Invalid user ID or password");
     }
 
-    const refreshToken = jwt.generateRefreshToken({ userId: user._id, role: user.role });
-    await authRepository.storeRefreshToken(user._id, refreshToken);
     await authRepository.updateLastLogin(user._id);
 
-    const token = generateAccessToken(profile);
-    const expiresAt = getTokenExpiry(ACCESS_TOKEN_EXPIRY);
-
-    return {
-        user: profile,
-        token,
-        expiresAt,
-    };
+    return issueAndStoreTokens(profile);
 }
 
-export async function logout(userId: string, refreshToken?: string, allDevices?: boolean): Promise<LogoutResponse> {
+export async function logout(
+    userId: string,
+    refreshToken?: string,
+    allDevices?: boolean
+): Promise<LogoutResponse> {
     if (allDevices) {
         const count = await authRepository.revokeAllRefreshTokens(userId);
         return { sessionsRevoked: count };
@@ -105,27 +93,66 @@ export async function getProfile(userId: string): Promise<UserProfile> {
     return user;
 }
 
-export async function refreshToken(userId: string): Promise<RefreshResponse> {
-    const user = await userRepository.findById(userId);
-    if (!user) {
+export async function refreshToken(rawRefreshToken: string): Promise<RefreshResponse> {
+    let decoded;
+    try {
+        decoded = jwt.verifyRefreshToken(rawRefreshToken);
+    } catch {
+        throw new ApiError(401, "Invalid or expired refresh token");
+    }
+
+    const userId = decoded.userId;
+    const profile = await userRepository.findById(userId);
+    if (!profile) {
         throw new ApiError(401, "Token expired or invalid");
     }
 
-    if (user.status === "suspended") {
+    if (profile.status === "suspended") {
         throw new ApiError(403, "Account suspended");
     }
 
-    const token = generateAccessToken(user);
-    const expiresAt = getTokenExpiry(ACCESS_TOKEN_EXPIRY);
+    const isStillValid = await authRepository.hasRefreshToken(userId, rawRefreshToken);
+    if (!isStillValid) {
+        // Reuse of an already-rotated/revoked refresh token: treat as theft.
+        await authRepository.revokeAllRefreshTokens(userId);
+        throw new ApiError(401, "Refresh token reuse detected — all sessions revoked");
+    }
 
-    return { token, expiresAt };
+    await authRepository.revokeRefreshToken(userId, rawRefreshToken);
+
+    const accessToken = jwt.generateAccessToken({ userId: profile.id, role: profile.role });
+    const newRefreshToken = jwt.generateRefreshToken({ userId: profile.id, role: profile.role });
+    await authRepository.storeRefreshToken(profile.id, newRefreshToken);
+
+    return buildTokenBundle(accessToken, newRefreshToken);
 }
 
-function generateAccessToken(profile: UserProfile): string {
-    return jwt.generateToken({
-        userId: profile.id,
-        role: profile.role,
-    });
+async function issueAndStoreTokens(profile: UserProfile): Promise<AuthResponse> {
+    const payload = { userId: profile.id, role: profile.role };
+
+    const accessToken = jwt.generateAccessToken(payload);
+    const refreshToken = jwt.generateRefreshToken(payload);
+
+    await authRepository.storeRefreshToken(profile.id, refreshToken);
+
+    const base = buildTokenBundle(accessToken, refreshToken);
+
+    return {
+        user: profile,
+        ...base,
+    };
+}
+
+function buildTokenBundle(
+    accessToken: string,
+    refreshToken: string
+): Omit<AuthResponse, "user"> {
+    return {
+        accessToken,
+        refreshToken,
+        accessTokenExpiresAt: getTokenExpiry(env.jwtAccessExpiresIn),
+        refreshTokenExpiresAt: getTokenExpiry(env.jwtRefreshExpiresIn),
+    };
 }
 
 function getTokenExpiry(expiry: string): string {

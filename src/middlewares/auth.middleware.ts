@@ -17,7 +17,7 @@ export function authenticate(
 
     const token = authHeader.split(" ")[1];
     try {
-        const decoded = jwt.verifyToken(token);
+        const decoded = jwt.verifyAccessToken(token);
         req.userId = decoded.userId;
         next();
     } catch {

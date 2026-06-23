@@ -69,4 +69,12 @@ export class MongoAuthRepository implements IAuthRepository {
         );
         return doc?.refreshTokens.length ?? 0;
     }
+
+    async hasRefreshToken(id: string, refreshToken: string): Promise<boolean> {
+        const doc = await UserModel.findOne(
+            { _id: id, refreshTokens: refreshToken },
+            { _id: 1 }
+        ).lean();
+        return doc !== null;
+    }
 }

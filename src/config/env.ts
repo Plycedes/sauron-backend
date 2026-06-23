@@ -13,8 +13,10 @@ const envSchema = Joi.object({
     CLOUDINARY_API_KEY: Joi.string().required(),
     CLOUDINARY_API_SECRET: Joi.string().required(),
 
-    JWT_SECRET: Joi.string().required(),
-    JWT_EXPIRES_IN: Joi.string().default("7d"),
+    JWT_ACCESS_SECRET: Joi.string().required(),
+    JWT_REFRESH_SECRET: Joi.string().required(),
+    JWT_ACCESS_EXPIRES_IN: Joi.string().default("15m"),
+    JWT_REFRESH_EXPIRES_IN: Joi.string().default("7d"),
 
     OPENAI_API_KEY: Joi.string().required(),
     OPENAI_EMBEDDING_MODEL: Joi.string().default("text-embedding-3-small"),
@@ -35,8 +37,10 @@ const env = {
     cors: envVars.CORS,
     mongodbURI: envVars.MONGODB_URI,
 
-    jwtSecret: envVars.JWT_SECRET,
-    jwtExpiresIn: envVars.JWT_EXPIRES_IN,
+    jwtAccessSecret: envVars.JWT_ACCESS_SECRET,
+    jwtRefreshSecret: envVars.JWT_REFRESH_SECRET,
+    jwtAccessExpiresIn: envVars.JWT_ACCESS_EXPIRES_IN,
+    jwtRefreshExpiresIn: envVars.JWT_REFRESH_EXPIRES_IN,
 
     cloudinaryCloudName: envVars.CLOUDINARY_CLOUD_NAME,
     cloudinaryAPIKey: envVars.CLOUDINARY_API_KEY,
