@@ -8,17 +8,26 @@ interface ValidationSchema {
     params?: ZodSchema;
 }
 
+function replaceProperties<T extends object>(target: T, parsed: unknown): void {
+    for (const key of Object.keys(target)) {
+        delete (target as Record<string, unknown>)[key];
+    }
+    if (parsed && typeof parsed === "object") {
+        Object.assign(target, parsed);
+    }
+}
+
 export function validate(schema: ValidationSchema) {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             if (schema.body) {
-                req.body = schema.body.parse(req.body);
+                replaceProperties(req.body, schema.body.parse(req.body));
             }
             if (schema.query) {
-                req.query = schema.query.parse(req.query) as typeof req.query;
+                replaceProperties(req.query, schema.query.parse(req.query));
             }
             if (schema.params) {
-                req.params = schema.params.parse(req.params) as typeof req.params;
+                replaceProperties(req.params, schema.params.parse(req.params));
             }
             next();
         } catch (error) {
