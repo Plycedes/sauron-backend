@@ -1,6 +1,11 @@
 import { projectRepository, membershipRepository } from '../repositories';
 import { ApiError } from '../utils/ApiError';
-import { ProjectInput, ProjectMember, ProjectResponse, ProjectWithMembers } from '../types/project.types';
+import {
+  ProjectInput,
+  ProjectMember,
+  ProjectResponse,
+  ProjectWithMembers,
+} from '../types/project.types';
 
 export async function createProject(
   input: ProjectInput,
