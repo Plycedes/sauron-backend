@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { inviteRepository, membershipRepository, userRepository } from '../repositories';
+import { companyRepository, inviteRepository, membershipRepository, userRepository } from '../repositories';
 import { ApiError } from '../utils/ApiError';
 import { InviteInput, InviteResponse } from '../types/invite.types';
 import { MembershipRole } from '../types/membership.types';
@@ -29,6 +29,22 @@ export async function sendInvite(
   // TODO: send invite email with token link via mailer microservice
 
   return invite;
+}
+
+export async function getPendingInvites(userId: string): Promise<InviteResponse[]> {
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  const invites = await inviteRepository.findPendingByEmail(user.email);
+
+  return Promise.all(
+    invites.map(async (invite) => {
+      const company = await companyRepository.findById(invite.companyId);
+      return { ...invite, companyName: company?.name };
+    }),
+  );
 }
 
 export async function acceptInvite(token: string, userId: string): Promise<void> {

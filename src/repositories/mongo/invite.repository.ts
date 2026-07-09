@@ -40,6 +40,14 @@ export class MongoInviteRepository implements IInviteRepository {
         return this.toResponse(doc as unknown as LeanInviteDoc);
     }
 
+    async findPendingByEmail(email: string): Promise<InviteResponse[]> {
+        const docs = await InviteModel.find({
+            email: email.toLowerCase(),
+            status: 'pending',
+        }).lean();
+        return docs.map((doc) => this.toResponse(doc as unknown as LeanInviteDoc));
+    }
+
     async create(data: InviteInput & { token: string; expiresAt: Date }): Promise<InviteResponse> {
         const doc = await InviteModel.create({
             ...data,

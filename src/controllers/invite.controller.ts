@@ -14,3 +14,9 @@ export const acceptInvite = asyncHandler(async (req: AuthRequest, res: Response)
 
     sendResponse(res, 200, {}, "Invite accepted successfully");
 });
+
+export const getPendingInvites = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+    const result = await inviteService.getPendingInvites(req.userId!);
+
+    sendResponse(res, 200, result, "Pending invites retrieved successfully");
+});
