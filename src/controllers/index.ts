@@ -1,8 +1,9 @@
-export * as authController from "./auth.controller";
-export * as userController from "./user.controller";
-export * as companyController from "./company.controller";
-export * as inviteController from "./invite.controller";
-export * as projectController from "./project.controller";
-export * as updateController from "./update.controller";
-export * as ragController from "./rag.controller";
-export * as analyticsController from "./analytics.controller";
+export * as authController from './auth.controller';
+export * as userController from './user.controller';
+export * as companyController from './company.controller';
+export * as membershipController from './membership.controller';
+export * as inviteController from './invite.controller';
+export * as projectController from './project.controller';
+export * as updateController from './update.controller';
+export * as ragController from './rag.controller';
+export * as analyticsController from './analytics.controller';
