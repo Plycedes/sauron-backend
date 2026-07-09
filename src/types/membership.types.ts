@@ -12,4 +12,5 @@ export interface MembershipResponse {
   companyId: string;
   role: MembershipRole;
   joinedAt: Date;
+  name?: string;
 }

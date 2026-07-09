@@ -36,8 +36,18 @@ export class MongoMembershipRepository implements IMembershipRepository {
   }
 
   async findAllByCompany(companyId: string): Promise<MembershipResponse[]> {
-    const docs = await MembershipModel.find({ companyId }).lean();
-    return docs.map((doc) => this.toResponse(doc as unknown as LeanMembershipDoc));
+    type PopulatedUser = { _id: { toString(): string }; fullName: string };
+    const docs = await MembershipModel.find({ companyId })
+      .populate<{ userId: PopulatedUser }>('userId', 'fullName')
+      .lean();
+    return docs.map((doc) => ({
+      _id: (doc._id as unknown as { toString(): string }).toString(),
+      userId: doc.userId?._id.toString() ?? '',
+      companyId: (doc.companyId as unknown as { toString(): string }).toString(),
+      role: doc.role,
+      joinedAt: doc.joinedAt,
+      name: doc.userId?.fullName,
+    }));
   }
 
   async findAllByUser(userId: string): Promise<MembershipResponse[]> {
