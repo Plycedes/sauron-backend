@@ -78,9 +78,12 @@ export async function getProjectStats(
     throw new ApiError(404, 'Project not found');
   }
 
-  await assertCompanyAccess(project.companyId.toString(), requestingUserId);
+  const membership = await assertCompanyAccess(project.companyId.toString(), requestingUserId);
 
-  if (!project.memberIds.some((id) => id.toString() === requestingUserId)) {
+  if (
+    membership.role !== 'company_admin' &&
+    !project.memberIds.some((id) => id.toString() === requestingUserId)
+  ) {
     throw new ApiError(403, 'You are not a member of this project');
   }
 
