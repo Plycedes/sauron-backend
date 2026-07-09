@@ -1,4 +1,12 @@
+import { MembershipRole } from './membership.types';
+
 export type ProjectStatus = "active" | "on_hold" | "completed" | "archived";
+
+export interface ProjectMember {
+    _id: string;
+    fullName: string;
+    role: MembershipRole;
+}
 
 export interface ProjectInput {
     name: string;
@@ -16,3 +24,7 @@ export interface ProjectResponse {
     status: ProjectStatus;
     createdAt: Date;
 }
+
+export type ProjectWithMembers = Omit<ProjectResponse, 'memberIds'> & {
+    members: ProjectMember[];
+};

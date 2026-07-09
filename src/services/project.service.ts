@@ -1,6 +1,6 @@
 import { projectRepository, membershipRepository } from '../repositories';
 import { ApiError } from '../utils/ApiError';
-import { ProjectInput, ProjectResponse } from '../types/project.types';
+import { ProjectInput, ProjectMember, ProjectResponse, ProjectWithMembers } from '../types/project.types';
 
 export async function createProject(
   input: ProjectInput,
@@ -20,20 +20,35 @@ export async function createProject(
 export async function getProjectsByCompany(
   companyId: string,
   requestingUserId: string,
-): Promise<ProjectResponse[]> {
+): Promise<ProjectWithMembers[]> {
   const membership = await membershipRepository.findByUserAndCompany(requestingUserId, companyId);
   if (!membership) {
     throw new ApiError(403, 'You do not belong to this company');
   }
 
-  const projects = await projectRepository.findByCompany(companyId);
-  console.log(projects);
+  const [projects, companyMemberships] = await Promise.all([
+    projectRepository.findByCompany(companyId),
+    membershipRepository.findAllByCompany(companyId),
+  ]);
+
+  const membershipMap = new Map(companyMemberships.map((m) => [m.userId, m]));
+
+  const enrich = (raw: ProjectResponse[]): ProjectWithMembers[] =>
+    raw.map(({ memberIds, ...rest }) => ({
+      ...rest,
+      members: memberIds
+        .map((id): ProjectMember | null => {
+          const m = membershipMap.get(id);
+          return m ? { _id: m.userId, fullName: m.name ?? 'Unknown', role: m.role } : null;
+        })
+        .filter((m): m is ProjectMember => m !== null),
+    }));
 
   if (membership.role === 'member') {
-    return projects.filter((p) => p.memberIds.includes(requestingUserId));
+    return enrich(projects.filter((p) => p.memberIds.includes(requestingUserId)));
   }
 
-  return projects;
+  return enrich(projects);
 }
 
 export async function assignMember(

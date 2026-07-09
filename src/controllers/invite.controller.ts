@@ -1,22 +1,24 @@
-import { Response } from "express";
-import { asyncHandler, sendResponse } from "../utils";
-import { inviteService } from "../services";
-import { AuthRequest } from "../middlewares/auth.middleware";
+import { Response } from 'express';
+import { asyncHandler, sendResponse } from '../utils';
+import { inviteService } from '../services';
+import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const sendInvite = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-    const result = await inviteService.sendInvite(req.body, req.userId!);
+  const result = await inviteService.sendInvite(req.body, req.userId!);
 
-    sendResponse(res, 201, result, "Invite sent successfully");
+  sendResponse(res, 201, result, 'Invite sent successfully');
 });
 
 export const acceptInvite = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-    await inviteService.acceptInvite(req.body.token, req.userId!);
+  await inviteService.acceptInvite(req.body.token, req.userId!);
 
-    sendResponse(res, 200, {}, "Invite accepted successfully");
+  sendResponse(res, 200, {}, 'Invite accepted successfully');
 });
 
-export const getPendingInvites = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
+export const getPendingInvites = asyncHandler(
+  async (req: AuthRequest, res: Response): Promise<void> => {
     const result = await inviteService.getPendingInvites(req.userId!);
 
-    sendResponse(res, 200, result, "Pending invites retrieved successfully");
-});
+    sendResponse(res, 200, result, 'Pending invites retrieved successfully');
+  },
+);

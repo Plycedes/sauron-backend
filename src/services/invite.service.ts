@@ -1,5 +1,10 @@
 import crypto from 'crypto';
-import { companyRepository, inviteRepository, membershipRepository, userRepository } from '../repositories';
+import {
+  companyRepository,
+  inviteRepository,
+  membershipRepository,
+  userRepository,
+} from '../repositories';
 import { ApiError } from '../utils/ApiError';
 import { InviteInput, InviteResponse } from '../types/invite.types';
 import { MembershipRole } from '../types/membership.types';
