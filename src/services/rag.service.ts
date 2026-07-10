@@ -63,7 +63,6 @@ export async function query(
         confidence: 1,
         hoursSpent: 1,
         text: 1,
-        embedding: 0,
         score: { $meta: 'vectorSearchScore' },
       },
     },
