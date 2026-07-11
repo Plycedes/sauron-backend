@@ -7,3 +7,4 @@ export * from './update.types';
 export * from './invite.types';
 export * from './rag.types';
 export * from './analytics.types';
+export * from './admin.types';
