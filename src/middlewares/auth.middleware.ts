@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { jwt, ApiError } from '../utils';
 import { MembershipRole } from '../types/membership.types';
 import { membershipRepository } from '../repositories';
+import { UserModel } from '../models/mongo';
 
 export interface AuthRequest extends Request {
   userId?: string;
@@ -29,6 +30,16 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
   } catch {
     throw new ApiError(401, 'Invalid or expired token');
   }
+}
+
+export function requireSuperAdmin(req: AuthRequest, res: Response, next: NextFunction): void {
+  (async () => {
+    const user = await UserModel.findById(req.userId).lean();
+    if (!user || user.role !== 'super_admin') {
+      throw new ApiError(403, 'Super admin access required');
+    }
+    next();
+  })().catch(next);
 }
 
 export function requireCompanyMember(minRole: MembershipRole = 'member') {
