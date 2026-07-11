@@ -22,14 +22,14 @@ export const listUsers = asyncHandler(async (req: AuthRequest, res: Response): P
 });
 
 export const getUserById = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const { userId } = req.params;
+  const { userId } = req.params as { userId: string };
   const result = await userAdminService.getUserById(userId);
   sendResponse(res, 200, result, 'User retrieved successfully');
 });
 
 export const updateUserStatus = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { userId } = req.params;
+    const { userId } = req.params as { userId: string };
     const { status } = req.body as { status: string };
     const result = await userAdminService.updateUserStatus(userId, status);
     sendResponse(res, 200, result, 'User status updated successfully');
@@ -38,7 +38,7 @@ export const updateUserStatus = asyncHandler(
 
 export const updateUserRole = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { userId } = req.params;
+    const { userId } = req.params as { userId: string };
     const { role } = req.body as { role: string };
     const result = await userAdminService.updateUserRole(userId, role);
     sendResponse(res, 200, result, 'User role updated successfully');
@@ -46,7 +46,7 @@ export const updateUserRole = asyncHandler(
 );
 
 export const deleteUser = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const { userId } = req.params;
+  const { userId } = req.params as { userId: string };
   await userAdminService.deleteUser(userId);
   sendResponse(res, 200, null, 'User deleted successfully');
 });

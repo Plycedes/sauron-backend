@@ -23,7 +23,7 @@ export const listCompanies = asyncHandler(
 
 export const getCompanyById = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { companyId } = req.params;
+    const { companyId } = req.params as { companyId: string };
     const result = await companyAdminService.getCompanyById(companyId);
     sendResponse(res, 200, result, 'Company retrieved successfully');
   },
@@ -31,7 +31,7 @@ export const getCompanyById = asyncHandler(
 
 export const deleteCompany = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { companyId } = req.params;
+    const { companyId } = req.params as { companyId: string };
     await companyAdminService.deleteCompany(companyId);
     sendResponse(res, 200, null, 'Company and all associated data deleted successfully');
   },

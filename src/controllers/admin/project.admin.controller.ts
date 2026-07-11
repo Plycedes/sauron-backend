@@ -25,7 +25,7 @@ export const listProjects = asyncHandler(async (req: AuthRequest, res: Response)
 
 export const getProjectById = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { projectId } = req.params;
+    const { projectId } = req.params as { projectId: string };
     const result = await projectAdminService.getProjectById(projectId);
     sendResponse(res, 200, result, 'Project retrieved successfully');
   },
@@ -33,7 +33,7 @@ export const getProjectById = asyncHandler(
 
 export const updateProjectStatus = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { projectId } = req.params;
+    const { projectId } = req.params as { projectId: string };
     const { status } = req.body as { status: string };
     const result = await projectAdminService.updateProjectStatus(projectId, status);
     sendResponse(res, 200, result, 'Project status updated successfully');
@@ -42,7 +42,7 @@ export const updateProjectStatus = asyncHandler(
 
 export const deleteProject = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { projectId } = req.params;
+    const { projectId } = req.params as { projectId: string };
     await projectAdminService.deleteProject(projectId);
     sendResponse(res, 200, null, 'Project and associated data deleted successfully');
   },

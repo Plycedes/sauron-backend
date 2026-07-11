@@ -24,14 +24,14 @@ export const listUpdates = asyncHandler(async (req: AuthRequest, res: Response):
 
 export const getUpdateById = asyncHandler(
   async (req: AuthRequest, res: Response): Promise<void> => {
-    const { updateId } = req.params;
+    const { updateId } = req.params as { updateId: string };
     const result = await updateAdminService.getUpdateById(updateId);
     sendResponse(res, 200, result, 'Update retrieved successfully');
   },
 );
 
 export const deleteUpdate = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const { updateId } = req.params;
+  const { updateId } = req.params as { updateId: string };
   await updateAdminService.deleteUpdate(updateId);
   sendResponse(res, 200, null, 'Update and associated embedding deleted successfully');
 });

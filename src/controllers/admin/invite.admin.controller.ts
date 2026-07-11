@@ -22,7 +22,7 @@ export const listInvites = asyncHandler(async (req: AuthRequest, res: Response):
 });
 
 export const deleteInvite = asyncHandler(async (req: AuthRequest, res: Response): Promise<void> => {
-  const { inviteId } = req.params;
+  const { inviteId } = req.params as { inviteId: string };
   await inviteAdminService.deleteInvite(inviteId);
   sendResponse(res, 200, null, 'Invite deleted successfully');
 });
