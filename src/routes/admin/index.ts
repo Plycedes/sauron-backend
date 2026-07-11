@@ -5,6 +5,7 @@ import userRouter from './user.admin.route';
 import companyRouter from './company.admin.route';
 import projectRouter from './project.admin.route';
 import inviteRouter from './invite.admin.route';
+import updateRouter from './update.admin.route';
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use('/users', userRouter);
 router.use('/companies', companyRouter);
 router.use('/projects', projectRouter);
 router.use('/invites', inviteRouter);
+router.use('/updates', updateRouter);
 
 export default router;
